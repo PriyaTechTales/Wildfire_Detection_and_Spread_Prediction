@@ -56,23 +56,7 @@ This project is a full-stack web application designed to assist in early *wildfi
 
 ---
 
-## 📦 Requirement
-
-### Python: 3.10+  
-### Django: 4.x+
-
-### Python Libraries:
-```bash
-numpy>=1.21.0  
-pandas>=1.3.0  
-scikit-learn>=1.0.0  
-joblib>=1.2.0  
-ultralytics>=8.0.0  
-opencv-python>=4.5.0
-
----
-
-### Steps or Commands to Run the Project
+# Steps or Commands to Run the Project
 1.Download the project zip file and extract it.
 
 2.Open the extracted folder in VSCode.
@@ -92,3 +76,18 @@ opencv-python>=4.5.0
 9.python manage.py runserver  
 
 10.Open the provided URL in a browser to access the application.
+
+
+## 📦 Requirement
+
+### Python: 3.10+  
+### Django: 4.x+
+
+### Python Libraries:
+```bash
+numpy>=1.21.0  
+pandas>=1.3.0  
+scikit-learn>=1.0.0  
+joblib>=1.2.0  
+ultralytics>=8.0.0  
+opencv-python>=4.5.0
