@@ -70,6 +70,8 @@ joblib>=1.2.0
 ultralytics>=8.0.0  
 opencv-python>=4.5.0
 
+---
+
 ### Steps or Commands to Run the Project
 1.Download the project zip file and extract it.
 
