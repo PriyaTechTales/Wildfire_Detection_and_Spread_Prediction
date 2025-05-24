@@ -17,17 +17,13 @@ This project is a full-stack web application designed to assist in early *wildfi
   - Powered by Random Forest Regressor for accurate regression predictions.
 
 - *Frontend*
-  - Built with *HTML, **CSS, and **JavaScript* for responsiveness and interactivity.
+  - Built with HTML, CSS, and JavaScript for responsiveness and interactivity.
 
 - *Backend*
   - Developed using *Django* for robust server-side logic and secure data flow.
 
 - *Database*
   - Uses *SQLite* to store user data, results, and logs.
-
-- *Visualizations*
-  - Interactive graphs to show prediction trends and detection results.
-
 ---
 
 ## 🧠 How It Works
