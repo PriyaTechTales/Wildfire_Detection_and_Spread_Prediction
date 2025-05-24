@@ -69,3 +69,24 @@ scikit-learn>=1.0.0
 joblib>=1.2.0  
 ultralytics>=8.0.0  
 opencv-python>=4.5.0
+
+### Steps or Commands to Run the Project
+1.Download the project zip file and extract it.
+
+2.Open the extracted folder in VSCode.
+
+3.Open the terminal in VSCode.
+
+4.Navigate to the project directory by running:bash
+
+5.Copy code
+
+6.cd wildfire_project
+
+7.Start the Django development server by running: bash
+
+8.Copy code
+
+9.python manage.py runserver  
+
+10.Open the provided URL in a browser to access the application.
