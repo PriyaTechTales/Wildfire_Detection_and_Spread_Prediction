@@ -56,7 +56,7 @@ This project is a full-stack web application designed to assist in early *wildfi
 
 ---
 
-## 📦 Requirements
+## 📦 Requirement
 
 ### Python: 3.10+  
 ### Django: 4.x+
