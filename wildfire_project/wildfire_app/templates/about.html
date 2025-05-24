@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+
+{% block title %}About - Wildfire Watch{% endblock %}
+
+{% block extra_css %}
+<style>
+    .about-hero {
+        width: 100%;
+        min-height: 100vh;
+        background-image: url('static/firemen2.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        position: relative;
+    }
+
+    .about-header {
+        height: 50vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: white;
+        padding: 0 20px;
+    }
+
+    .about-content {
+        max-width: 700px;
+        animation: fadeIn 1.5s ease-in-out;
+    }
+
+    .about-header h1 {
+        font-size: 50px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #514d4d;
+    }
+
+    .about-header p {
+        font-size: 25px;
+        line-height: 1.6;
+        color: #000000;
+    }
+
+    .about-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 60px 20px;
+        background: rgba(0, 0, 0, 0.7);
+    }
+
+    .about-box {
+        max-width: 900px;
+        background: rgba(255, 235, 235, 0.1);
+        padding: 30px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        text-align: left;
+        transition: 0.3s ease-in-out;
+    }
+
+    .about-box:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .about-box h2 {
+        font-size: 28px;
+        margin-bottom: 15px;
+        color: #ff5733;
+    }
+
+    .about-box p, .about-box ul {
+        font-size: 18px;
+        line-height: 1.8;
+    }
+
+    .about-box ul {
+        list-style: none;
+        padding-left: 0;
+    }
+
+    .about-box ul li {
+        padding-left: 25px;
+        position: relative;
+        margin-bottom: 10px;
+    }
+
+    .about-box ul li::before {
+        content: "✔";
+        color: #ff5733;
+        position: absolute;
+        left: 0;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="about-hero">
+    <!-- About Header -->
+    <header class="about-header">
+        <div class="about-content">
+            <h1>About Wildfire Watch</h1>
+            <p>AI-powered detection and prediction to combat wildfires and save lives.</p>
+        </div>
+    </header>
+
+    <!-- About Content -->
+    <section class="about-container">
+        <div class="about-box">
+            <h2>Our Mission</h2>
+            <p>At Wildfire Watch, our goal is to leverage artificial intelligence to predict and detect wildfires in real time. By analyzing environmental data, we help authorities take swift action, mitigating damage and saving lives.</p>
+        </div>
+
+        <div class="about-box">
+            <h2>How It Works</h2>
+            <p>Our deep learning models process satellite imagery, weather conditions, and geographical data to provide accurate wildfire forecasts. Real-time alerts ensure that response teams are always a step ahead.
+                <br> Our Machine learning model process the spread area with the help of some key features.
+            </p>
+        </div>
+
+        <div class="about-box">
+            <h2>Why Choose Us?</h2>
+            <ul>
+                <li><strong>Real-time wildfire detection:</strong> Stay updated with instant alerts.</li>
+                <li><strong>AI-powered spread prediction:</strong> Forecast wildfire movement before it happens.</li>
+                <li><strong>Seamless integration:</strong> Works with emergency services and environmental agencies.</li>
+            </ul>
+        </div>
+    </section>
+</section>
+{% endblock %}

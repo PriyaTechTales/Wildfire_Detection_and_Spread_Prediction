@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fire Detection - Wildfire Watch</title>
+    <style>
+/* Google Font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+/* Reset and Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Background - Fixed */
+body {
+    background: url('static/forest4.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: white;
+    overflow: auto; /* Allows scrolling */
+}
+
+/* Navbar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ff5733;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+}
+
+.nav-links li {
+    margin: 0 15px;
+} 
+
+.nav-links a {
+    text-decoration: none;
+    color: white;
+    transition: 0.3s;
+}
+
+.nav-links a:hover {
+    color: #ff5733;
+}
+
+/* Upload Section */
+.upload-container {
+    min-height: 100vh; /* Allows scrolling */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 100px; /* Space below navbar */
+}
+
+.upload-section {
+    background: rgba(24, 22, 22, 0.881);
+    padding: 40px;
+    border-radius: 10px;
+    text-align: center;
+    width: 80%;
+    max-width: 500px;
+    margin-bottom: 40px;
+}
+
+/* Custom File Upload Button */
+.custom-file-upload {
+    display: inline-block;
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    background: #ff5733;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.custom-file-upload:hover {
+    background: #e14b29;
+}
+
+.detect-fire {
+    display: inline-block;
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    background: #ff5733;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.detect-fire:hover {
+    background: #e14b29;
+}
+
+/* Hide default file input */
+#imageUpload {
+    display: none;
+}
+
+/* Selected File Name */
+#file-name {
+    margin-top: 10px;
+    font-size: 16px;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+/* Fire Input Section */
+#fire-input-section {
+    background: rgba(24, 22, 22, 0.9);
+    padding: 30px;
+    border-radius: 10px;
+    display: none;
+    width: 80%;
+    max-width: 400px;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+#fire-input-section input {
+    display: block;
+    margin: 10px auto;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: none;
+    width: 90%;
+}
+
+#fire-input-section button {
+    background: #ff5733;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+#fire-input-section button:hover {
+    background: #e14b29;
+}
+
+/* Footer */
+footer {
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    text-align: center;
+    padding: 15px;
+    width: 100%;
+    position: relative; /* Changed from fixed */
+}
+
+    </style>
+</head>
+<body>
+
+<!-- Navigation Bar -->
+<nav class="navbar">
+    <div class="logo">🔥 Wildfire Watch</div>
+    <ul class="nav-links">
+        <li><a href="{% url 'home' %}">Home</a></li>  <!-- ✅ Correct home link -->
+        <li><a href="{% url 'about' %}">About</a></li>
+        <li><a href="{% url 'contact' %}">Contact</a></li>
+        <li><a href="{% url 'login' %}">Login</a></li>
+        <li><a href="{% url 'signup' %}">Signup</a></li>>
+    </ul>
+</nav>
+
+<!-- Centered Upload Section -->
+<div class="upload-container">
+    <div class="upload-section">
+        <h1>Upload Image for Fire Detection</h1>
+        <label for="imageUpload" class="custom-file-upload">📷 Choose File</label>
+        <input type="file" id="imageUpload" accept="image/*" onchange="showFileName()">
+        <p id="file-name">No file chosen</p>
+        <button class="detect-fire" onclick="detectFire()">Detect Fire</button>
+        <div id="result"></div>
+    </div>
+
+    <!-- Fire Spread Prediction (Appears if fire is detected) -->
+    <div id="fire-input-section" class="hidden">
+        <h2>🔥 Fire Detected! Enter Additional Details:</h2>
+        <input type="number" id="temperature" placeholder="Temperature (°C)">
+        <input type="number" id="humidity" placeholder="Relative Humidity (%)">
+        <input type="number" id="wind" placeholder="Wind Speed (km/h)">
+        <input type="number" id="rain" placeholder="Rainfall (mm)">
+        <button onclick="predictSpread()">Predict Fire Spread</button>
+        <div id="spreadResult"></div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer>
+    <p>&copy; 2025 Wildfire Detection. All Rights Reserved.</p>
+</footer>
+
+<script>
+function detectFire() {
+    let imageInput = document.getElementById("imageUpload");
+    let resultDiv = document.getElementById("result");
+    let fireInputSection = document.getElementById("fire-input-section");
+
+    if (imageInput.files.length === 0) {
+        resultDiv.innerHTML = "<p style='color: red;'>Please upload an image first.</p>";
+        return;
+    }
+
+    // Simulating AI Detection (Replace with real AI Model)
+    let fireDetected = Math.random() < 0.5;  // Randomly determines fire or no fire
+
+    if (fireDetected) {
+        resultDiv.innerHTML = "<p style='color: red; font-size: 20px;'>🔥 Fire Detected!</p>";
+        fireInputSection.style.display = "block";  // Show the input section
+    } else {
+        resultDiv.innerHTML = "<p style='color: green; font-size: 20px;'>✅ No Fire Detected!</p>";
+        fireInputSection.style.display = "none";  // Hide the input section
+    }
+}
+
+function showFileName() {
+    let fileInput = document.getElementById("imageUpload");
+    let fileNameDisplay = document.getElementById("file-name");
+
+    if (fileInput.files.length > 0) {
+        fileNameDisplay.textContent = "Selected: " + fileInput.files[0].name;
+    } else {
+        fileNameDisplay.textContent = "No file chosen";
+    }
+}
+
+function predictSpread() {
+    let temperature = document.getElementById("temperature").value;
+    let humidity = document.getElementById("humidity").value;
+    let wind = document.getElementById("wind").value;
+    let rain = document.getElementById("rain").value;
+    let spreadResultDiv = document.getElementById("spreadResult");
+
+    if (!temperature || !humidity || !wind || !rain) {
+        spreadResultDiv.innerHTML = "<p style='color: yellow;'>⚠️ Please fill all fields.</p>";
+        return;
+    }
+
+    // Basic AI Prediction Simulation (Replace with real ML model)
+    let spreadScore = (temperature * 0.4) + (wind * 0.3) - (humidity * 0.2) - (rain * 0.1);
+    
+    let prediction;
+    if (spreadScore > 50) {
+        prediction = "<p style='color: red;'>🔥 High Spread Risk!</p>";
+    } else if (spreadScore > 20) {
+        prediction = "<p style='color: orange;'>⚠️ Medium Spread Risk.</p>";
+    } else {
+        prediction = "<p style='color: green;'>✅ Low Spread Risk.</p>";
+    }
+
+    spreadResultDiv.innerHTML = prediction;
+}
+</script>
+
+</body>
+</html>

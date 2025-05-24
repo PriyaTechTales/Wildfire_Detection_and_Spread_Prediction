@@ -1,0 +1,382 @@
+{% extends 'base.html' %}
+
+{% block title %}Wildfire Detection - Wildfire Watch{% endblock %}
+
+{% block extra_css %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+        background: url('/static/forest4.jpg') no-repeat center center fixed;
+        background-size: cover;
+        color: white;
+        overflow: auto;
+    }
+
+    .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        background: rgba(0, 0, 0, 0.8);
+        position: fixed;
+        width: 100%;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+    }
+
+    .logo {
+        font-size: 24px;
+        font-weight: bold;
+        color: #ff5733;
+    }
+
+    .nav-links {
+        list-style: none;
+        display: flex;
+    }
+
+    .nav-links li {
+        margin: 0 15px;
+    }
+
+    .nav-links a {
+        text-decoration: none;
+        color: white;
+        transition: 0.3s;
+    }
+
+    .nav-links a:hover {
+        color: #ff5733;
+    }
+
+    .upload-container {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-top: 120px;
+    }
+
+    .upload-section {
+        background: rgba(76, 70, 70, 0.65);
+        padding: 40px;
+        border-radius: 10px;
+        text-align: center;
+        width: 80%;
+        max-width: 500px;
+        margin-bottom: 40px;
+    }
+
+    .custom-file-upload, .detect-fire, #fire-input-section button {
+        padding: 9px 9px;
+        font-size: 12px;
+        font-weight: bold;
+        color: white;
+        background: #e14b29;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .custom-file-upload:hover, .detect-fire:hover, #fire-input-section button:hover {
+        background: #e14b29;
+    }
+
+    #imageUpload {
+        display: none;
+    }
+
+    #file-name {
+        margin-top: 10px;
+        font-size: 16px;
+        color: #ffffff;
+        font-weight: bold;
+    }
+
+    #image-preview {
+        margin: 20px auto;
+        display: none;
+        width: 250px;
+        height: 250px;
+        border: 3px solid white;
+        border-radius: 10px;
+        object-fit: cover;
+    }
+
+    #fire-input-section {
+        background: rgba(24, 22, 22, 0.9);
+        padding: 30px;
+        border-radius: 10px;
+        display: none;
+        width: 80%;
+        max-width: 400px;
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    #fire-input-section input {
+        display: block;
+        margin: 10px auto;
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 5px;
+        border: none;
+        width: 90%;
+    }
+
+    footer {
+        background: rgba(0, 0, 0, 0.9);
+        color: white;
+        text-align: center;
+        padding: 15px;
+        width: 100%;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<nav class="navbar">
+    <div class="logo">🔥FireCast AI</div>
+    <ul class="nav-links">
+        <li><a href="{% url 'home' %}">Home</a></li>
+        <li><a href="{% url 'about' %}">About</a></li>
+        <li><a href="{% url 'contact' %}">Contact</a></li>
+        {% if user.is_authenticated %}
+            <li><a href="{% url 'profile' %}">Profile</a></li>
+            <li><a href="{% url 'logout' %}">Logout</a></li>
+        {% else %}
+            <li><a href="{% url 'login' %}">Login</a></li>
+            <li><a href="{% url 'signup' %}">Sign Up</a></li>
+        {% endif %}
+    </ul>
+</nav>
+
+<div class="upload-container">
+    <div class="upload-section">
+        <h1>Upload Image for Fire Detection</h1>
+        <form id="upload-form" enctype="multipart/form-data">
+            {% csrf_token %}
+            <label for="file-input" class="custom-file-upload">
+                📷 Choose File
+                <input type="file" id="file-input" accept="image/*" onchange="previewAndShowName()" style="display: none;">
+            </label>
+        </form>        
+        <p id="file-name">No file chosen</p>
+
+        <!-- Image Preview -->
+        <img id="image-preview" src="#" alt="Preview">
+
+        <button class="detect-fire" id="detect-btn">Detect Fire</button>
+        <div id="loading" style="display: none; margin-top: 10px; color: #ff5733;">Processing image...</div>
+        <div id="result" style="margin-top: 20px;"></div>
+    </div>
+
+    <div id="fire-input-section">
+        <h2>🔥 Fire Detected! Enter Additional Details:</h2>
+        <div class="row" style="margin: 20px 0;">
+            <div class="form-group" style="margin: 10px 0;">
+                <label for="ffmc">FFMC (Fine Fuel Moisture Code)</label>
+                <input type="number" class="form-control" id="ffmc" name="ffmc" step="0.1" min="18" max="96" 
+                    style="width: 90%; margin: 5px auto; padding: 10px; border-radius: 5px; border: none; background: rgba(255,255,255,0.9);">
+                <small style="display: block; color: #ccc;">Range: 18.7 to 96.2</small>
+            </div>
+            
+            <div class="form-group" style="margin: 10px 0;">
+                <label for="dmc">DMC (Duff Moisture Code)</label>
+                <input type="number" class="form-control" id="dmc" name="dmc" step="0.1" min="1" max="291"
+                    style="width: 90%; margin: 5px auto; padding: 10px; border-radius: 5px; border: none; background: rgba(255,255,255,0.9);">
+                <small style="display: block; color: #ccc;">Range: 1.1 to 291.3</small>
+            </div>
+            
+            <div class="form-group" style="margin: 10px 0;">
+                <label for="dc">DC (Drought Code)</label>
+                <input type="number" class="form-control" id="dc" name="dc" step="0.1" min="7" max="860"
+                    style="width: 90%; margin: 5px auto; padding: 10px; border-radius: 5px; border: none; background: rgba(255,255,255,0.9);">
+                <small style="display: block; color: #ccc;">Range: 7.9 to 860.6</small>
+            </div>
+            
+            <div class="form-group" style="margin: 10px 0;">
+                <label for="isi">ISI (Initial Spread Index)</label>
+                <input type="number" class="form-control" id="isi" name="isi" step="0.1" min="0" max="56"
+                    style="width: 90%; margin: 5px auto; padding: 10px; border-radius: 5px; border: none; background: rgba(255,255,255,0.9);">
+                <small style="display: block; color: #ccc;">Range: 0.0 to 56.1</small>
+            </div>
+            
+            <div class="form-group" style="margin: 10px 0;">
+                <label for="temp">Temperature (°C)</label>
+                <input type="number" class="form-control" id="temp" name="temp" step="0.1" min="2" max="33"
+                    style="width: 90%; margin: 5px auto; padding: 10px; border-radius: 5px; border: none; background: rgba(255,255,255,0.9);">
+                <small style="display: block; color: #ccc;">Range: 2.2 to 33.3</small>
+            </div>
+            
+            <div class="form-group" style="margin: 10px 0;">
+                <label for="rh">Relative Humidity (%)</label>
+                <input type="number" class="form-control" id="rh" name="rh" step="1" min="15" max="100"
+                    style="width: 90%; margin: 5px auto; padding: 10px; border-radius: 5px; border: none; background: rgba(255,255,255,0.9);">
+                <small style="display: block; color: #ccc;">Range: 15 to 100</small>
+            </div>
+            
+            <div class="form-group" style="margin: 10px 0;">
+                <label for="wind">Wind Speed (km/h)</label>
+                <input type="number" class="form-control" id="wind" name="wind" step="0.1" min="0" max="9"
+                    style="width: 90%; margin: 5px auto; padding: 10px; border-radius: 5px; border: none; background: rgba(255,255,255,0.9);">
+                <small style="display: block; color: #ccc;">Range: 0.4 to 9.4</small>
+            </div>
+            
+            <div class="form-group" style="margin: 10px 0;">
+                <label for="rain">Rainfall (mm/m2)</label>
+                <input type="number" class="form-control" id="rain" name="rain" step="0.1" min="0" max="6"
+                    style="width: 90%; margin: 5px auto; padding: 10px; border-radius: 5px; border: none; background: rgba(255,255,255,0.9);">
+                <small style="display: block; color: #ccc;">Range: 0.0 to 6.4</small>
+            </div>
+        </div>
+        <button onclick="predictSpread()" style="background: #ff5733; color: white; padding: 12px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s;">
+            Predict Fire Spread
+        </button>
+        <div id="spreadResult" style="margin-top: 15px;"></div>
+    </div>
+</div>
+
+<script>
+    function previewAndShowName() {
+        const input = document.getElementById("file-input");
+        const preview = document.getElementById("image-preview");
+        const fileNameDisplay = document.getElementById("file-name");
+    
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                preview.style.display = "block";
+            };
+            reader.readAsDataURL(input.files[0]);
+            fileNameDisplay.textContent = "Selected: " + input.files[0].name;
+        } else {
+            fileNameDisplay.textContent = "No file chosen";
+            preview.style.display = "none";
+        }
+    }
+    
+    document.getElementById("detect-btn").addEventListener("click", function () {
+        const fileInput = document.getElementById("file-input");
+        const resultDiv = document.getElementById("result");
+        const fireInputSection = document.getElementById("fire-input-section");
+        const loading = document.getElementById("loading");
+    
+        const file = fileInput.files[0];
+        if (!file) {
+            resultDiv.innerHTML = "<p style='color: yellow;'>⚠️ Please upload an image.</p>";
+            fireInputSection.style.display = "none";
+            return;
+        }
+    
+        // Show loading
+        loading.style.display = "block";
+        resultDiv.innerHTML = "";
+        
+        // Create form data
+        const formData = new FormData();
+        formData.append('image', file);
+        formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+        
+        // Send the image to the server for processing
+        fetch('/detect/', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Server responded with status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            loading.style.display = "none";
+            
+            if (data.status === 'Fire Detected') {
+                // Get the most significant detection
+                let mainDetection = "Fire Detected";
+                if (data.detections && data.detections.length > 0) {
+                    // Prioritize smoke detection over flame
+                    const hasSmoke = data.detections.some(d => 
+                        d.class.toLowerCase().includes('smoke'));
+                    if (hasSmoke) {
+                        mainDetection = "Smoke Detected";
+                    }
+                }
+                
+                resultDiv.innerHTML = `<p style='color: red; font-size: 20px;'>🔥 ${mainDetection}</p>`;
+                fireInputSection.style.display = "block";
+            } else if (data.status === 'No Fire') {
+                resultDiv.innerHTML = "<p style='color: green; font-size: 20px;'>✅ No Fire Detected</p>";
+                fireInputSection.style.display = "none";
+            } else {
+                let errorMessage = data.error || 'Unknown error';
+                resultDiv.innerHTML = `<p style='color: yellow;'>⚠️ Error: ${errorMessage}</p>`;
+                fireInputSection.style.display = "none";
+            }
+        })
+        .catch(error => {
+            loading.style.display = "none";
+            console.error("Error:", error);
+            resultDiv.innerHTML = `<p style='color: yellow;'>⚠️ Error: ${error.message || 'Failed to process image'}</p>`;
+            fireInputSection.style.display = "none";
+        });
+    });
+    
+    function predictSpread() {
+        // Get all input values
+        const formData = new FormData();
+        formData.append('ffmc', document.getElementById('ffmc').value);
+        formData.append('dmc', document.getElementById('dmc').value);
+        formData.append('dc', document.getElementById('dc').value);
+        formData.append('isi', document.getElementById('isi').value);
+        formData.append('temp', document.getElementById('temp').value);
+        formData.append('rh', document.getElementById('rh').value);
+        formData.append('wind', document.getElementById('wind').value);
+        formData.append('rain', document.getElementById('rain').value);
+
+        // Get CSRF token
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        // Send data to server
+        fetch('/predict_spread/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(data => Promise.reject(data.error));
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.error) {
+                document.getElementById('spreadResult').innerHTML = 
+                    `<p style='color: yellow;'>⚠️ Error: ${data.error}</p>`;
+            } else {
+                document.getElementById('spreadResult').innerHTML = 
+                    `<p style='color: orange;'>🔥 Predicted Fire Spread Area: ${data.area.toFixed(2)} hectares</p>`;
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            document.getElementById('spreadResult').innerHTML = 
+                `<p style='color: yellow;'>⚠️ Error: ${error}</p>`;
+        });
+    }
+    </script>    
+{% endblock %}  

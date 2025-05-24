@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Wildfire Watch{% endblock %}
+
+{% block extra_css %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+        background: #111;
+        color: white;
+    }
+
+    /* Navbar */
+    .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        background: rgba(0, 0, 0, 0.8);
+        position: fixed;
+        width: 100%;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+    }
+
+    .logo {
+        font-size: 24px;
+        font-weight: bold;
+        color: #ff5733;
+    }
+
+    .nav-links {
+        list-style: none;
+        display: flex;
+    }
+
+    .nav-links li {
+        margin: 0 15px;
+    }
+
+    .nav-links a {
+        text-decoration: none;
+        color: white;
+        transition: 0.3s;
+    }
+
+    .nav-links a:hover {
+        color: #ff5733;
+    }
+
+    /* Hero Section */
+    .hero {
+        height: 100vh;
+        background: url('static/firemen.jpg') no-repeat center center/cover;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .hero-content {
+        max-width: 650px;
+        animation: fadeIn 2s ease-in-out;
+        color:rgb(55, 50, 50);
+    }
+
+    .hero h1 {
+        font-size: 50px;
+        font-weight: bold;
+    }
+
+    .hero p {
+        font-size: 30px;
+        margin-top: 10px;
+        color: #000000;
+    }
+
+    .get-started {
+        margin-top: 20px;
+        padding: 12px 24px;
+        font-size: 18px;
+        border: none;
+        background: #000000;
+        color: #ffffff;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .get-started:hover {
+        background: #444241ac;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    footer {
+        background-color: #000000;
+        color: #ffffff;
+        text-align: center;
+        padding: 20px 0;
+    }
+
+    footer p {
+        margin: 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Navigation Bar -->
+<!-- Navigation Bar -->
+<nav class="navbar">
+    <div class="logo">🔥FireCast AI</div>
+    <ul class="nav-links">
+        <li><a href="{% url 'home' %}" class="active">Home</a></li>
+        <li><a href="{% url 'about' %}">About</a></li>
+        <li><a href="{% url 'contact' %}">Contact</a></li>
+
+        {% if user.is_authenticated %}
+            <li><a href="{% url 'profile' %}">Profile</a></li>
+            <li><a href="{% url 'logout' %}">Logout</a></li>
+        {% else %}
+            <li><a href="{% url 'login' %}">Login</a></li>
+            <li><a href="{% url 'signup' %}">Sign Up</a></li>
+        {% endif %}
+    </ul>
+</nav>
+<!-- Hero Section -->
+<header class="hero">
+    <div class="hero-content">
+        <h1>AI-Powered Wildfire Detection & Spread Prediction</h1>
+        <p>Predict and prevent wildfires before they spread.</p>
+        {% if user.is_authenticated %}
+            <button class="get-started" onclick="window.location.href='{% url 'wildfire_detection' %}';"> Get Started</button>
+        {% else %}
+            <button class="get-started" onclick="window.location.href='{% url 'login' %}';"> Get Started</button>
+        {% endif %}
+    </div>
+</header>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".nav-links a").forEach(anchor => {
+            anchor.addEventListener("click", function (e) {
+                if (this.hash !== "") {
+                    e.preventDefault();
+                    const hash = this.hash;
+                    document.querySelector(hash).scrollIntoView({
+                        behavior: "smooth"
+                    });
+                }
+            });
+        });
+
+        document.querySelectorAll("form").forEach(form => {
+            form.addEventListener("submit", function (e) {
+                e.preventDefault();
+                alert("Form submitted successfully!");
+            });
+        });
+    });
+</script>
+{% endblock %}
